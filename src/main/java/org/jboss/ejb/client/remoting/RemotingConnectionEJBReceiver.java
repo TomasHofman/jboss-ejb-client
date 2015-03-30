@@ -258,7 +258,7 @@ public final class RemotingConnectionEJBReceiver extends EJBReceiver {
             messageOutputStream = channelAssociation.acquireChannelMessageOutputStream();
             dataOutputStream = wrapMessageOutputStream(clientInvocationContext, channelAssociation, messageOutputStream);
             invocationId = channelAssociation.getNextInvocationId();
-            logger.debugf("Sending invocation #%d to endpoint %s", invocationId, channelAssociation.getChannel().getConnection().getEndpoint().getName());
+            logger.debugf("Sending invocation #%d to endpoint %s", invocationId, channelAssociation.getChannel().getConnection().getRemoteEndpointName());
             channelAssociation.receiveResponse(invocationId, ejbReceiverInvocationContext);
             messageWriter.writeMessage(dataOutputStream, invocationId, clientInvocationContext);
         } catch (Throwable t) {
