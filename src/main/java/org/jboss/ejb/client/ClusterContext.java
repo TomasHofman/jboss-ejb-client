@@ -169,7 +169,9 @@ public final class ClusterContext implements EJBClientContext.EJBReceiverContext
         final EJBReceiverContext selectedNodeReceiverContext = this.clientContext.getNodeEJBReceiverContext(selectedNodeName);
         // the node is already connected, so return it
         if (selectedNodeReceiverContext != null) {
+            logger.debug("Selected node already connected: " + selectedNodeReceiverContext.toString());
             if (selectedNodeReceiverContext.getReceiver().acceptsModule(ejbLocator.getAppName(), ejbLocator.getModuleName(), ejbLocator.getDistinctName())) {
+                logger.debug("Node name: " + selectedNodeReceiverContext.getReceiver().getNodeName());
                 return selectedNodeReceiverContext;
             } else {
                 logger.debug("Ignoring node " + selectedNodeName + " since it cannot handle appName=" + ejbLocator.getAppName() + ",moduleName=" + ejbLocator.getModuleName() + ",distinct-name=" + ejbLocator.getDistinctName());
@@ -178,6 +180,7 @@ public final class ClusterContext implements EJBClientContext.EJBReceiverContext
         // get the receiver from the node manager
         final EJBReceiver ejbReceiver = clusterNodeManager.getEJBReceiver();
         if (ejbReceiver != null) {
+            logger.debug("Receiver obtained from clusterNodeManager. Node name: " + ejbReceiver.getNodeName());
             // register the receiver and let it create the receiver context
             this.registerEJBReceiver(ejbReceiver);
             // let the client context return the newly associated receiver context for the node name.
@@ -191,6 +194,8 @@ public final class ClusterContext implements EJBClientContext.EJBReceiverContext
                     logger.debug("Ignoring node " + selectedNodeName + " since it cannot handle appName=" + ejbLocator.getAppName() + ",moduleName=" + ejbLocator.getModuleName() + ",distinct-name=" + ejbLocator.getDistinctName());
                 }
             }
+        } else {
+            logger.debugf("No ejbReceiver for node name %s", clusterNodeManager.getNodeName());
         }
         // try some other node (if any) in this cluster. The currently selected node is
         // excluded from this next attempt
@@ -259,6 +264,7 @@ public final class ClusterContext implements EJBClientContext.EJBReceiverContext
                 }
                 // don't add a ClusterNodeManager for a node which is already managed
                 if (this.nodeManagers.containsKey(nodeName)) {
+                    logger.debug("NodeManager for node " + nodeName + " already exists.");
                     continue;
                 }
                 this.nodeManagers.put(nodeName, clusterNodeManager);

@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -181,8 +182,10 @@ public final class EJBClientInvocationContext extends Attachable {
             if (context == null) {
                 throw Logs.MAIN.noReceiverAssociatedWithInvocation();
             }
+            log.debug("Sending request.");
             context.getEjbReceiverContext().getReceiver().processInvocation(this, context);
         } else {
+            log.debug("Executing interceptor " + chain[idx]);
             chain[idx].handleInvocation(this);
         }
     }
@@ -195,6 +198,7 @@ public final class EJBClientInvocationContext extends Attachable {
      * @throws Exception if the retry request was not successfully sent
      */
     void retryRequest() throws Exception {
+        log.debug("Retrying request, interceptorChainIndex: " + interceptorChainIndex + ", chain: " + Arrays.toString(interceptorChain));
         // if a previous request wasn't yet done, then this isn't really a "retry",
         // so we error out
         final int idx = this.interceptorChainIndex;

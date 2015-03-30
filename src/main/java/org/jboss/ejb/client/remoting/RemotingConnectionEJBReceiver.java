@@ -251,15 +251,18 @@ public final class RemotingConnectionEJBReceiver extends EJBReceiver {
         DataOutputStream dataOutputStream = null;
         MessageOutputStream messageOutputStream = null;
         Throwable requestSendFailureCause = null;
+        Short invocationId = null;
         try {
             channelAssociation = this.requireChannelAssociation(ejbReceiverInvocationContext.getEjbReceiverContext());
             final MethodInvocationMessageWriter messageWriter = new MethodInvocationMessageWriter(this.marshallerFactory);
             messageOutputStream = channelAssociation.acquireChannelMessageOutputStream();
             dataOutputStream = wrapMessageOutputStream(clientInvocationContext, channelAssociation, messageOutputStream);
-            final short invocationId = channelAssociation.getNextInvocationId();
+            invocationId = channelAssociation.getNextInvocationId();
+            logger.debugf("Sending invocation #%d to endpoint %s", invocationId, channelAssociation.getChannel().getConnection().getEndpoint().getName());
             channelAssociation.receiveResponse(invocationId, ejbReceiverInvocationContext);
             messageWriter.writeMessage(dataOutputStream, invocationId, clientInvocationContext);
         } catch (Throwable t) {
+            logger.debugf(t, "Exception during invocation #%d processing", invocationId);
             requestSendFailureCause = t;
         } finally {
             try {
@@ -613,6 +616,8 @@ public final class RemotingConnectionEJBReceiver extends EJBReceiver {
         ChannelAssociation channelAssociation;
         synchronized (this.channelAssociations) {
             channelAssociation = this.channelAssociations.get(ejbReceiverContext);
+            logger.debug("channelAssociations: " + channelAssociations);
+            logger.debug("selected channelAssociation: " + channelAssociation);
         }
         if (channelAssociation == null) {
             throw Logs.MAIN.channelNotReadyForCommunication(EJB_CHANNEL_NAME, ejbReceiverContext);

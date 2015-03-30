@@ -60,6 +60,7 @@ public final class ReceiverInterceptor implements EJBClientInterceptor {
             }
         } else {
             final Affinity affinity = locator.getAffinity();
+            logger.debug("Affinity is " + affinity);
             if (affinity instanceof NodeAffinity) {
                 final String nodeName = ((NodeAffinity) affinity).getNodeName();
                 if (excludedNodes.contains(nodeName)) {
@@ -68,6 +69,7 @@ public final class ReceiverInterceptor implements EJBClientInterceptor {
                 receiverContext = clientContext.requireNodeEJBReceiverContext(nodeName);
             } else if (affinity instanceof ClusterAffinity) {
                 final Affinity weakAffinity = invocationContext.getInvocationHandler().getWeakAffinity();
+                logger.debug("Weak affinity is " + weakAffinity);
                 if (weakAffinity instanceof NodeAffinity) {
                     final String nodeName = ((NodeAffinity) weakAffinity).getNodeName();
                     final EJBReceiver nodeReceiver;
@@ -88,6 +90,7 @@ public final class ReceiverInterceptor implements EJBClientInterceptor {
                 }
             } else if (affinity == Affinity.NONE) {
                 final Affinity weakAffinity = invocationContext.getInvocationHandler().getWeakAffinity();
+                logger.debug("Weak affinity is " + weakAffinity);
                 if (weakAffinity instanceof NodeAffinity) {
                     final String nodeName = ((NodeAffinity) weakAffinity).getNodeName();
                     final EJBReceiver nodeReceiver;
