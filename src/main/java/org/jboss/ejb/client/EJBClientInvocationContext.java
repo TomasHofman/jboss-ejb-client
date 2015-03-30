@@ -182,7 +182,10 @@ public final class EJBClientInvocationContext extends Attachable {
             if (context == null) {
                 throw Logs.MAIN.noReceiverAssociatedWithInvocation();
             }
-            log.debug("Sending request.");
+            log.debug("Sending request - EJBReceiverInvocationContext.nodeName: " + context.getNodeName() +
+                    "; ejbReceiverContext: " + context.getEjbReceiverContext().toString() + "; ejbReceiver.nodeName: "
+                    + context.getEjbReceiverContext().getReceiver().getNodeName());
+
             context.getEjbReceiverContext().getReceiver().processInvocation(this, context);
         } else {
             log.debug("Executing interceptor " + chain[idx]);
