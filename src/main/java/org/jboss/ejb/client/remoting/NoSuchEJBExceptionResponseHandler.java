@@ -74,10 +74,11 @@ class NoSuchEJBExceptionResponseHandler extends ProtocolMessageHandler {
         }
         // retry the invocation on a different node
         try {
-            logger.info("Retrying invocation which failed on node " + receiverInvocationContext.getNodeName() + " with exception:", noSuchEJBException);
+            logger.infof(noSuchEJBException, "Retrying invocation #%d which failed on node " + receiverInvocationContext.getNodeName() + " with exception:", invocationId);
             receiverInvocationContext.retryInvocation(true);
         } catch (Exception e) {
             // retry failed, let the waiting client know of this failure
+            logger.debugf(e, "Retry for invocation #%d failed:", invocationId);
             this.channelAssociation.resultReady(invocationId, new ResultProducer(e));
             return;
         }
